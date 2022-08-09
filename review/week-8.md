@@ -1,0 +1,224 @@
+# Week 8 Review
+
+* Design patterns
+    - Object oriented design patterns
+        - Singleton design pattern
+            - All about ensuring that there is only a single instance within the application
+            - Implement the design pattern
+                - have a private constructor
+                - have a private static field that references an instance of the class
+                - public method that checks if the instance already exists for that static field, and if not, instantiates the object for the first time
+        - Factory design pattern
+            - A design pattern that helps us create specific examples of a parent type
+            - Ex. PetFactory
+            - We may have an abstract class or interface called Pet
+            - PetFactory will help us create specific versions of Pet, such as Dog, Cat, etc.
+    - Test automation design pattern(s)
+        - Page object model design pattern
+            - Is a way to organize WebElements into a single class that represents the page
+            - From there, we can define methods such as `typeUsername` or `typePassword` that will actually interact with the page
+                - PageFactory is an extension to the page object model provided by Selenium that allows us to utilize the `@FindBy` annotation instead to represent WebElements
+                    - PageFactory.initElements(driver, this);
+* Maven
+    - pom.xml
+        - Project object model (not the same as page object model)
+        - Configuration for a Maven project (Java project managed by Maven)
+    - Build tool
+        - Build lifecycle
+            - Phases you should really know about
+                - Validate phase
+                    - Validates the project configuration and checks to see if we have all dependencies
+                - Compile phase
+                    - Where our source code is compiled into bytecode
+                - Test phase
+                    - Where test cases are executed
+                - Package phase
+                    - Where our project is packaged into a .jar file (or .war file)
+                - Other ones as well, but not really that important for us to know about from a practical standpoint
+    - Dependency manager
+        - `<dependencies></dependencies>`
+            - Where we list all of the external libraries that our project requires
+            - Maven can go download those dependencies by referring to this section of the pom.xml file
+* TestNG
+    - A testing framework that can be used for unit testing, integration testing, and E2E testing
+    - We specifically are utilizing TestNG for E2E testing
+        - We need to utilize Selenium alongside TestNG to do so
+        - Selenium is what actually automates the browser
+    - TestNG provides the actual ability to create "test cases"
+        - When we execute the test cases, it's able to report the number that failed and the number that passed
+        - TestNG provides assertions (things that we check for that need to be true in order for the test case to pass)
+            - Assertions are a way of programmatically checking whether actual == expected
+            - Assert class provides assertions
+                - `assertEquals`
+                - `assertNotEquals`
+                - `assertTrue`
+                - `assertFalse`
+                - `assertSame`
+                - `assertNotSame`
+                - `assertNull`
+                - `fail`
+    - XML configuration
+        - `testng.xml` file (default file that you would be creating)
+        - Each .xml file describes a single "test suite"
+            - A test suite is a collection of tests
+        - Inside of the configuration file is where we specify the structure of our test suite along with what test cases should be included as part of the test suite
+        - We can then tell Maven or our IDE to execute the .xml file and run the tests listed in the .xml file
+    - Test organization (top to bottom)
+        - Suite: an entire collection of test cases
+            - Test: a category of tests (ex. regression tests, smoke tests OR ex2. mobile tests, pc tests, etc.)
+                - Class: a class that contains test case methods
+                    - Group: a grouping of test methods within a test class
+                        - Method: the actual test case itself
+        - Hierarchy can be established within XML configuration
+        - You can also specify "groups" using the groups attribute within the @Test annotation
+    - Annotations
+        - @BeforeSuite
+        - @AfterSuite
+        - @BeforeTest (test categories)
+        - @AfterTest (test categories)
+        - @BeforeClass
+        - @AfterClass
+        - @BeforeMethod (test cases)
+        - @AfterMethod  (test cases)
+    - Test dependencies (attributes within @Test annotation)
+        - dependsOnMethods
+            - We can specify which methods a particular test case method depends on
+            - This means the methods listed should run before the current test case method
+        - dependsOnGroups
+            - We can specify which test groups a particualr test case method depends on
+            - This means all methods within the listed groups should run before the current test case method
+    - @DataProvider
+        - A method annotated with @DataProvider that will provide a 2D array containing test data
+        - For example, if you want to test login functionality, you may utilize a data provider to supply rows of usernames and passwords
+        - The DataProvider method may utilize external libraries such as Apache POI (or anything of your choosing) to read excel files for example and extract data from those excel files
+        - Can be used to establish "data driven testing"
+    - priority
+        - attribute within @Test annotation
+        - can be used to set the priority of test methods
+        - The lower the number, the higher the priority
+            - ex. -100 has a higher priority than 1
+        - Can have negative numbers + positive numbers
+* Data-driven testing
+    - Where test cases are driven by external data
+    - Ex. Valid login test scenario
+        - if we provide 100 logins, we have 100 test cases
+    - Accomplished via
+        - TestNG: DataProviders
+        - Cucumber: parameterization using "inline parameters" or "scenario outlines"
+* Cucumber
+    - BDD framework
+        - Used to allow us to perform Behavior Driven Development
+    - Files
+        - Feature files
+            - Gherkin
+                - Syntax for our feature file
+            - Keywords
+                - Given
+                - When
+                - Then
+            - Contains many scenarios for a particular feature
+                - "Test scenarios"
+        - Step definition files
+            - Contain the actual automation test scripts
+            - Typically we will write Selenium code within the step definition files that will perform the actual automation
+            - We will also write TestNG assertions within the "Then" step definitions to assert expected v. actual conditions
+        - TestRunner class
+            - Links the feature files with the step definition files
+            - Integrates with TestNG (to provide test reporting and to treat scenarios in the feature files as actual test cases)
+    - Parameterization
+        - How we can achieve data-driven testing w/ Cucumber
+        - Inline parameters
+            - Arguments for scenarios are passed "inline"
+            - Utilized when we define individual scenarios instead of a "scenario outline"
+        - Scenario outline
+            - Data is passed in via "example" tables within a feature file
+            - Each row in the table corresponds to a single scenario
+            - Scenario outlines are used when each scenario uses the same steps but we need varying data
+* Selenium
+    - A way to automate actions in a web browser
+    - Webpages are made up of HTML elements
+    - Selenium can be used to locate elements and interact with them
+    - Often utilized alongside testing frameworks such as TestNG in order to create automated E2E test cases
+    - Interfaces + Classes
+        - WebDriver (interface): WebDriver objects represent control of the web browser
+            - Key methods:
+                - `.get(String url)`: go to a particular webpage
+                - `.findElement(By locator)`: Used to find the first occurrence of a WebElement that matches a locator
+                - `.findElements(By locator)`: Used to find all elements that match a locator `(List<WebElement>)`
+        - ChromeOptions class
+            - Allows for the configuration of the Chrome web browser that is being started up
+                - `ChromeOptions options = new ChromeOptions()`
+                - `options.addArgument("--incognito")`
+                - `options.addArgument("--headless")`
+                - `WebDriver driver = new ChromeDriver(options)`
+        - WebElement (interface): A WebElement object represents a particular element on the page. All interesting interactions with the page typically happen through methods of the WebElement object
+            - Key methods:
+                - `.click()`: click on the element
+                - `.sendKeys(CharSequence keysToSend)`: Type into an element
+                - `.getText()`: returns text of the element
+                - `.isDisplayed()`: boolean representing whether an element is displayed or not
+                - `.getAttribute(String attributeName)`: get value of an HTML attribute for the element
+        - WebDriverWait (class): A WebDriverWait object provides the ability to wait explicitly for a particular condition to occur, up to a maximum amount of time
+            - Polls the browser every 500ms until the condition occurs, or throws an exception if the maximum specified time is reached
+            - `WebDriverWait wdw = new WebDriverWait(driver, Duration.ofSeconds(10))`
+            - `wdw.until(ExpectedCondition condition)`
+        - ExpectedConditions
+            - Provides conditions that we can explicitly wait for, such as
+                - `ExpectedConditions.alertIsPresent()`
+                - `ExpectedConditions.attributeContains(By locator, String attribute, String value)`
+                - `ExpectedConditions.elementToBeClickable(By locator)`
+                - `ExpectedConditions.presenceOfElementLocated(By locator)`
+                - `ExpectedConditions.textToBe(By locator, String value)`
+                - `ExpectedConditions.titleContains(String fraction)`
+                - `ExpectedConditions.titleIs(String title)`
+                - `ExpectedConditions.urlContains(String fraction)`
+                - `ExpectedConditions.urlToBe(String url)`
+                - `ExpectedConditions.visibilityOfElementLocated(By locator)`
+    - Waits
+        - Implicit wait
+            - Is a global configuration on the WebDriver object
+            - It is not clear what Selenium specifically must wait for, as it will wait for any element that is not yet available
+            - Is a "black box" unlike explicit waits (which are transparent in terms of what is being waited upon)
+            - `driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10))`
+        - Explicit wait
+            - A specific condition is specified by the programmer that Selenium must wait for
+            - Browser is polled every 500ms until the specific condition occurs or the maximum time is reached
+            - Is typically preferred over implicit wait since it is clear to any other programmer reading the code what Selenium is waiting for
+            - Uses a `WebDriverWait` object and an `ExpectedCondition` as mentioned previously
+    - Page Object Model
+        - A way to represent a page through a single class
+        - Essentially, it's a way of encapuslating WebElements on a webpage into a single unit
+        - Benefits
+            - Less redundancy: Less code duplication
+            - Easier maintenance: If the WebElement locators must be updated due to changes made by frontend devs, then the locators can be easily updated in one location. Especially useful if many test cases use the same WebElements
+            - Easier readability: Other automation testers can easily go to the page object class and see what interactions are being made / what web elements are being used
+    - PageFactory
+        - An extension upon the page object model
+        - `PageFactory.initElements(driver, this)`
+        - Used in order to allow for WebElement fields to be populated via `@FindBy(<locator>="...")` syntax
+* JDBC (Java Database Connectivity)
+    - An API to connect to a relational database and interact with the database
+        - Requires a database specific driver to communicate (ex. Postgres driver)
+    - Utilized within the DAO layer in order to programmatically perform CRUD operations
+    - Classes and interfaces
+        - DriverManager class: used to register a Driver object and obtain a `Connection` object
+        - Connection interface: represents a connection with the database
+        - Statement interface: enables execution of "raw string" queries (does not protect against SQL injection)
+        - PreparedStatement interface: enables execution of predefined query templates where data can be passed in as parameters that correspond with template placeholders (protects against SQL injection)
+        - ResultSet interface: represents the data that is retrieved after executing a query. Can be iterated over and data extracted, row by row
+        - SQLException class: the single (checked) exception that could occur from the JDBC API
+    - How to utilize JDBC
+        1. Register driver with the DriverManager class
+        2. Use DriverManager.getConnection(String url, String username, String password) to obtain Connection object
+        3. Use Connection object to obtain Statement OR PreparedStatement interface
+        4. Execute query to retrieve ResultSet (if using SELECT statement) using `.executeQuery()` OR executeUpdate() if inserting, deleting, or modifying data (which will return an int representing number of records updated instead)
+        5. If using ResultSet, iterate over ResultSet to retrieve data
+* Javalin
+    - Simple, lightweight framework for building Web APIs
+    - Makes use of functional interfaces to enable usage of lambdas
+    - Endpoints can be mapped via `app.get(String path, Handler lambda)` or `.post`, `.put`, `.patch`, `.delete`, etc.
+    - Handler is a functional interface that defines the single `.handle(Context ctx)` abstract method
+        - Can be used to define lambdas in the form `(ctx) -> {}`
+        - These lambdas serve as the code that will be executed when an HTTP request is received to the mapped endpoint
+        - The `Context` parameter provides the ability to extract information from the HTTP request and include information into the HTTP response
+        
